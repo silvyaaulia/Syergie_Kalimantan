@@ -3,15 +3,15 @@
 
 
 //Pin Switch
-const int switch_nn = 22;
-const int switch_manual = 47;           // input swicth main
-const int switch_tunning = 49;          // input swicth main
+const int switch_nn = 6;
+const int switch_manual = 7;           // input swicth main
+const int switch_tunning = 8;          // input swicth main
 
-const int switch_speed_left = 51;  
-const int switch_speed_right = 28; 
+const int switch_speed_left = 4;  
+const int switch_speed_right = 30; 
  
-const int switch_steer_left = 53;  
-const int switch_steer_right = 30;  
+const int switch_steer_left = 5;  
+const int switch_steer_right = 28;  
 
 const int switch_steer1 = 36;           //tunning steer 1
 const int switch_steer2 = 37;           //tunning steer 2
@@ -42,14 +42,23 @@ void setup() {
 
   pinMode(switch_speed_left, INPUT);              //switch speed
   pinMode(switch_speed_right, INPUT);
-  digitalWrite(switch_speed_left, HIGH);
+  analogWrite(switch_speed_left, 255);
   digitalWrite(switch_speed_right, HIGH);
 
   pinMode(switch_steer_left, INPUT);              //switch steer
   pinMode(switch_steer_right, INPUT);
   digitalWrite(switch_steer_left, HIGH);
-  digitalWrite(switch_steer_left, HIGH);
+  digitalWrite(switch_steer_right, HIGH);
 
+  pinMode(switch_nn ,INPUT);
+  analogWrite(switch_nn ,255);
+  pinMode(switch_manual ,INPUT);
+  analogWrite(switch_manual ,255);
+  pinMode(switch_tunning ,INPUT);
+  analogWrite(switch_tunning ,255);
+  pinMode(switch_manual ,INPUT);
+  analogWrite(switch_manual ,255);
+  
   pinMode(switch_steer1, INPUT);                  //tunning PID
   pinMode(switch_steer2, INPUT);
   pinMode(switch_steer3, INPUT);

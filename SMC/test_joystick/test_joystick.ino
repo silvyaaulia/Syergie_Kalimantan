@@ -9,6 +9,7 @@
 #define joy5 A5
 #define joy6 A6         
 #define joy7 A7
+#define joy8 A8
 
 int potensio0 = 0;
 int potensio1 = 0;
@@ -18,7 +19,7 @@ int potensio4 = 0;
 int potensio5 = 0;
 int potensio6 = 0;
 int potensio7 = 0;
-
+int potensio8 = 0;
 
 void setup() {
   // Serial begin
@@ -66,6 +67,10 @@ void loop() {
         Serial.println(potensio7);
  //       delay (500);
 
+        Serial.print("   A8: ");
+        potensio8 = analogRead(joy8);
+        Serial.println(potensio8);
+ //       delay (500);
 
         delay(1000);
 }
