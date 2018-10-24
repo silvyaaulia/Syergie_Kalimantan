@@ -323,8 +323,21 @@ void task_position_control(void *pvParameters)  // Task PID
   int countE, countF;
   for (;;)
   {
-    Serial.print("Kd baru : ");
-    Serial.println(float(Kd_baru + 1),5);
+    if ((position_in >= 1100) && (position_in <= 1500)){ 
+    position_in = map(position_in,1100,1500,0,250);
+    }
+    if ((position_in > 1500) && (position_in <= 1900)){ 
+    position_in = map(position_in,1500,1900,250,500);
+    }
+    P = P + Kp_baru;
+    I = I + Ki_baru;
+    D = D + Kd_baru;
+    Serial.print("Kp : ");
+    Serial.print(float(P),5);Serial.print("\t");
+    Serial.print("Ki : ");
+    Serial.print(float(I),5);Serial.print("\t");
+    Serial.print("Kd : ");
+    Serial.print(float(D),5);Serial.println();
     countF = millis() - countE; countE = millis();
 //    Serial.print(F("Time TaskPID: "));Serial.println(countF);
 
