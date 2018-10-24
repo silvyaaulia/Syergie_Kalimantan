@@ -1,6 +1,9 @@
 //Wiring Guide
 //Using Arduino Mega 2560
 //LCD 20x4 I2C: SDA -> PIN 20; SCL -> PIN 21; 
+/* 
+ *  Mochamad Teguh Subarkah
+ */
 
 //LIBRARIES
 #include <SPI.h>
