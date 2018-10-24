@@ -108,7 +108,7 @@ double pwm_out;
 
 double cepat = 0;
 double position_out = 0 ;
-double position_in ;
+double position_in,position_in_pot ;
 double Error; // perbedaan feedback dengan input
 double Sum = 0; // hasil integral error
 
@@ -248,9 +248,9 @@ void TaskSerial(void *pvParameters)  // Task Serial
           dtostrf(0, 10, 0, st);
       }
       else if(buff[i]==speed_ID){
-          //Serial.print("Speed = ");
+          Serial.print("Speed = ");
           Speed = atoi(st);
-          //Serial.println(Speed);
+          Serial.println(Speed);
       }
       else if(buff[i]==steer_ID){
           Serial.print("Steer = ");
@@ -290,7 +290,7 @@ void TaskSerial(void *pvParameters)  // Task Serial
 
     counter++;
     
-    vTaskDelayUntil( &xLastWakeTime, 10);
+    vTaskDelayUntil( &xLastWakeTime, 1);
   }
 }
 
@@ -309,7 +309,7 @@ void TaskRpmMeasurement(void *pvParameters)  // Task for RPM and Measurements
     rpm_engine = speed_1.calcRPM();
     rpm_prop = speed_2.calcRPM();
     rpm_pump = speed_3.calcRPM();
-    vTaskDelayUntil( &xLastWakeTime, 10);
+    vTaskDelayUntil( &xLastWakeTime, 1);
   }
 }
 
@@ -324,20 +324,22 @@ void task_position_control(void *pvParameters)  // Task PID
   for (;;)
   {
     if ((position_in >= 1100) && (position_in <= 1500)){ 
-    position_in = map(position_in,1100,1500,0,250);
+    position_in_pot = map(position_in,1100,1500,0,250);
     }
     if ((position_in > 1500) && (position_in <= 1900)){ 
-    position_in = map(position_in,1500,1900,250,500);
+    position_in_pot = map(position_in,1500,1900,250,500);
     }
+    Serial.print("Position_in : ");
+    Serial.println(position_in_pot);
     P = P + Kp_baru;
     I = I + Ki_baru;
     D = D + Kd_baru;
-    Serial.print("Kp : ");
+   /* Serial.print("Kp : ");
     Serial.print(float(P),5);Serial.print("\t");
     Serial.print("Ki : ");
     Serial.print(float(I),5);Serial.print("\t");
     Serial.print("Kd : ");
-    Serial.print(float(D),5);Serial.println();
+    Serial.print(float(D),5);Serial.println();*/
     countF = millis() - countE; countE = millis();
 //    Serial.print(F("Time TaskPID: "));Serial.println(countF);
 
@@ -346,7 +348,7 @@ void task_position_control(void *pvParameters)  // Task PID
     rpm_pump = speed_3.calcRPM();
     double position_out = analogRead(pin_steer);
     // Perhitungan PID
-    Error = position_in - position_out;
+    Error = position_in_pot - position_out;
     Buff = position_out; // untuk mencari derivatif
     Sum = Sum + Error; // hasil integral dari error
     PTerm = Error*P; // Proporsional
@@ -394,7 +396,7 @@ void task_speed_control(void *pvParameters)  // Task PID
   int countE, countF;
   for (;;)
   {
-    //Serial.print("Speed =  ");
+    Serial.print("Speed =  ");
     
     if (Speed == 1500){
       pwm_out = 0;
@@ -412,13 +414,13 @@ void task_speed_control(void *pvParameters)  // Task PID
       pwm_out = 255;
     }
     
-    //Serial.println(pwm_out);
+    Serial.println(pwm_out);
     analogWrite(4,255);
     analogWrite(5,pwm_out);
 
     
-    // Delay sebesar 11 tick ~ 198 ms
-    vTaskDelayUntil( &xLastWakeTime, 11);
+    // Delay sebesar 1 tick ~ 15 ms
+    vTaskDelayUntil( &xLastWakeTime, 1);
   }
 }
 
@@ -453,7 +455,7 @@ void TaskLCD(void *pvParameters)  // Task LCD
     lcd.print(lcd_buffer3);
 
     // Delay sebesar 28 tick, 1 tick ~ 18 ms
-    vTaskDelayUntil( &xLastWakeTime, 28);//( 120 / portTICK_PERIOD_MS ) );
+    vTaskDelayUntil( &xLastWakeTime, 1);//( 120 / portTICK_PERIOD_MS ) );
   }
 }
 
