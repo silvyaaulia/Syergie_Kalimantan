@@ -67,12 +67,12 @@ int tunning4 = 0;
 
 // Pin Switch
 //Switch utama
-const int switch_nn = 22;
+const int switch_nn = 8;
 const int switch_manual = 7;           // input swicth main
 const int switch_tunning = 6;          // input swicth main
-const int switch_speed_left = 4;  
+const int switch_speed_left = 5;  
 const int switch_speed_right = 28; 
-const int switch_steer_left = 5;  
+const int switch_steer_left = 4;  
 const int switch_steer_right = 30;  
 const int switch_steer1 = 36;           //tunning steer 1
 const int switch_steer2 = 37;           //tunning steer 2
@@ -126,6 +126,9 @@ byte mac[]    = {  0xDA, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
 IPAddress ip(10, 48, 20, 37);        //IP for arduino
 IPAddress server(10, 48, 20, 36);   //IP for raspi/pc
 
+EthernetClient ethClient;
+PubSubClient client(ethClient);
+
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -133,10 +136,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i=0;i<length;i++) {
     Serial.print((char)payload[i]);
   }
-}
 
-EthernetClient ethClient;
-PubSubClient client(ethClient);
+  if(strcmp(topic,"MainControl") == 0){
+    client.publish("ControlBox","connected");
+  }
+}
 
 void reconnect() {
   // Loop until we're reconnected
@@ -283,8 +287,8 @@ void setup() {
   Serial.begin(57600);
 
   // Switch
-  pinMode(switch_manual ,INPUT);                  //switch UTAMA
-  analogWrite(switch_manual ,255);
+  pinMode(switch_nn ,INPUT);                  //switch UTAMA
+  analogWrite(switch_nn ,255);
   pinMode(switch_tunning ,INPUT);
   analogWrite(switch_tunning ,255);
   pinMode(switch_manual ,INPUT);
@@ -293,21 +297,21 @@ void setup() {
   pinMode(switch_speed_left, INPUT);              //switch speed
   pinMode(switch_speed_right, INPUT);
   analogWrite(switch_speed_left, 255);
-  digitalWrite(switch_speed_right, HIGH);
+  analogWrite(switch_speed_right, 255);
 
   pinMode(switch_steer_left, INPUT);              //switch steer
   pinMode(switch_steer_right, INPUT);
-  digitalWrite(switch_steer_left, HIGH);
-  digitalWrite(switch_steer_right, HIGH);
+  analogWrite(switch_steer_left, 255);
+  analogWrite(switch_steer_right, 255);
   
   pinMode(switch_steer1, INPUT);                  //tunning PID
   pinMode(switch_steer2, INPUT);
   pinMode(switch_steer3, INPUT);
   pinMode(switch_steer4, INPUT);
-  digitalWrite(switch_steer1, HIGH);
-  digitalWrite(switch_steer2, HIGH);
-  digitalWrite(switch_steer3, HIGH);
-  digitalWrite(switch_steer4, HIGH);
+  analogWrite(switch_steer1, 255);
+  analogWrite(switch_steer2, 255);
+  analogWrite(switch_steer3, 255);
+  analogWrite(switch_steer4, 255);
 
   //pinMode(led_nn, OUTPUT);
   pinMode(led_main, OUTPUT);
@@ -464,8 +468,8 @@ void loop() {
     //Serial.print(state_speed_right); 
     //Speed Control Left
     if (state_speed_left == LOW) {
-      //speed_left = analogRead(joy_speed_left);
-      speed_left = analogRead(joy_tunning1);      //testing
+      speed_left = analogRead(joy_speed_left);
+      //speed_left = analogRead(joy_tunning1);      //testing
       delay(100);
       Serial.print(" Speed left: ");
       pulse_speed_in_left = pulse_speed(speed_left);
@@ -514,8 +518,8 @@ void loop() {
         client.publish("spc_steer2",dtostrf(pulse_steer_in_right, 4, 0, msgBuffer));
       }
     }
+   }
   }
- 
   // Switch Main : off
   // Input smc dari pixhawk 
   else {
