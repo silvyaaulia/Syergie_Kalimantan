@@ -1,3 +1,7 @@
+/* 
+ *  Mochamad Teguh Subarkah
+ */
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <SoftwareSerial.h>
@@ -134,20 +138,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
   
-  if(strcmp(topic,"spc_speed2") == 0){
+  if(strcmp(topic,"spc_speed1") == 0){
     client.publish("confirm_speed2","Received");
     Speed = value;
     sprintf(buf_Tx,"\t%dS\t\n",Speed);
-    //mySerial.print(buf_Tx);
+    mySerial.print(buf_Tx);
   } 
-  if(strcmp(topic,"spc_steer2") == 0){
+  if(strcmp(topic,"spc_steer1") == 0){
     client.publish("confirm_steer2","Received");
     steer = value;
     sprintf(buf_Tx,"\t%dR\t\n",steer);
     Serial.println(buf_Tx);
     mySerial.print(buf_Tx);
   }
-  if(strcmp(topic,"steer2_kp") == 0){
+  if(strcmp(topic,"steer1_kp") == 0){
     client.publish("confirm_kp2","Received");
     Kp_baru = (String(String(data_in[0])+String(data_in[1])+String(data_in[2])+String(data_in[3]))).toFloat();
     
@@ -155,7 +159,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     //Serial.println(buf_Tx);
     mySerial.print("\t");mySerial.print(Kp_baru);mySerial.print(Kp_ID);mySerial.println("\t");
   }
-  if(strcmp(topic,"steer2_ki") == 0){
+  if(strcmp(topic,"steer1_ki") == 0){
     client.publish("confirm_ki2","Received");
     Ki_baru = (String(String(data_in[0])+String(data_in[1])+String(data_in[2])+String(data_in[3])+String(data_in[4])+String(data_in[5])+String(data_in[6]))).toFloat();
     //sprintf(buf_Tx,"\t%fI\t\n",Ki_baru);
@@ -163,7 +167,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     //Serial.println(float(Ki_baru),4);
     mySerial.print("\t");mySerial.print(float(Ki_baru),5);mySerial.print(Ki_ID);mySerial.println("\t");
   }
-  if(strcmp(topic,"steer2_kd") == 0){
+  if(strcmp(topic,"steer1_kd") == 0){
     client.publish("confirm_kd2","Received");
     Kd_baru = (String(String(data_in[0])+String(data_in[1])+String(data_in[2])+String(data_in[3]))).toFloat();
     sprintf(buf_Tx,"\t%fD\t\n",Kd_baru);
@@ -172,12 +176,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     mySerial.print("\t");mySerial.print(float(Kd_baru),5);mySerial.print(Kd_ID);mySerial.println("\t");
   }
   else if(topic[0]=='M'){
-    client.publish("2EngineSpeed",dtostrf(rpm_1, 4, 0, buf));
-    client.publish("2PropellerSpeed",dtostrf(rpm_2, 4, 0, buf));
-    client.publish("2PumpSpeed",dtostrf(rpm_3, 4, 0, buf));
-    client.publish("2Fuel",dtostrf(level_tanki, 2, 0, buf));
-    client.publish("2Azimuth",dtostrf(azimuth, 2, 0, buf));
-    client.publish("2Box","connected");
+    client.publish("1EngineSpeed",dtostrf(rpm_1, 4, 0, buf));
+    client.publish("1PropellerSpeed",dtostrf(rpm_2, 4, 0, buf));
+    client.publish("1PumpSpeed",dtostrf(rpm_3, 4, 0, buf));
+    client.publish("1Fuel",dtostrf(level_tanki, 2, 0, buf));
+    client.publish("1Azimuth",dtostrf(azimuth, 2, 0, buf));
+    client.publish("1Box","connected");
   }
 }
 
@@ -198,11 +202,11 @@ void reconnect() {
       // Once connected, publish an announcement...
       // ... or not...
       // ... and resubscribe
-      client.subscribe("spc_speed2");
-      client.subscribe("spc_steer2");
-      client.subscribe("steer2_kp");
-      client.subscribe("steer2_ki");
-      client.subscribe("steer2_kd");
+      client.subscribe("spc_speed1");
+      client.subscribe("spc_steer1");
+      client.subscribe("steer1_kp");
+      client.subscribe("steer1_ki");
+      client.subscribe("steer1_kd");
       client.subscribe("MainControl");
     } else {
       Serial.print("failed, rc=");
