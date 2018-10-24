@@ -67,9 +67,9 @@ int tunning4 = 0;
 
 // Pin Switch
 //Switch utama
-const int switch_nn = 8;
+const int switch_nn = 6;
 const int switch_manual = 7;           // input swicth main
-const int switch_tunning = 6;          // input swicth main
+const int switch_tunning = 8;          // input swicth main
 const int switch_speed_left = 5;  
 const int switch_speed_right = 28; 
 const int switch_steer_left = 4;  
@@ -123,8 +123,12 @@ double azimuth;
 
 /* Declare IP Address */
 byte mac[]    = {  0xDA, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-IPAddress ip(10, 48, 20, 37);        //IP for arduino
+/*IPAddress ip(10, 48, 20, 37);        //IP for arduino
 IPAddress server(10, 48, 20, 36);   //IP for raspi/pc
+*/
+IPAddress ip(123, 45, 0, 9);        //IP for arduino
+IPAddress server(123, 45, 0, 10);   //IP for raspi/pc
+
 
 EthernetClient ethClient;
 PubSubClient client(ethClient);
@@ -332,11 +336,9 @@ void loop() {
   double kp1, kd1, kp2, kd2,kp3, kd3, kp4, kd4, ki1, ki2, ki3,ki4, xx;
 
   
-
  if (!client.connected()) {
    reconnect();
   }
-
 
  /*NN
   state_nn = digitalRead (switch_nn);
