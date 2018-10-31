@@ -34,6 +34,16 @@
 #define pwm_pressure    5
 #define direct_valve_1_1 2
 #define direct_valve_1_2 3
+#define boom_up 6
+#define boom_down 7
+#define pin_button_left A10
+#define pin_button_right A11
+#define pin_button_speed A12
+#define pin_manual 8
+#define pin_steer_boom 9
+#define pin_LED_power A8
+#define pin_LED_communication A9
+
 
 #define pin_level_tanki   A0
 #define pin_steer         A1
@@ -53,6 +63,7 @@
 #define Kp_ID 'P'
 #define Ki_ID 'I'
 #define Kd_ID 'D'
+#define communication_ID 'C'
 
 /*-----( Define LCD )-----*/
 // set the LCD address to 0x27 for a 20 chars 4 line display
@@ -68,6 +79,13 @@ void task_speed_control( void *pvParameters );
 void TaskLCD( void *pvParameters );
 void TaskRPM( void *pvParameters );
 
+/* Remote State */
+int manual_state ;
+int boom_steer_state ;
+
+/* LED Indicator */
+int pwm_LED_power ; 
+int pwm_LED_communication = 0;
 /* Fuel Tank Level, Steer, Depth, and PWM*/
 int level_tangki = 0;
 int steer = 0;
@@ -141,6 +159,10 @@ void setup() {
   Serial2.begin(115200);
   Serial3.begin(115200);
   
+  pinMode(pin_steer_boom, INPUT);
+  pinMode(pin_manual, INPUT);
+  analogWrite(pin_steer_boom, 255);
+  analogWrite(pin_manual, 255);
   
   lcd.begin(20,4);         // initialize the lcd for 20 chars 4 lines, turn on backlight
 
@@ -214,6 +236,14 @@ void setup() {
     ,  1  // Priority
     ,  NULL );
 
+    xTaskCreate(
+    TaskManual
+    ,  (const portCHAR *) "Manual"
+    ,  128  // Stack size
+    ,  NULL
+    ,  1  // Priority
+    ,  NULL );
+
   // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
 }
 
@@ -275,6 +305,11 @@ void TaskSerial(void *pvParameters)  // Task Serial
           Ki_baru = atof(st);
           Serial.println(I);
       }
+      else if(buff[i]==communication_ID){
+          Serial.print("LED Com = ");
+          pwm_LED_communication = atoi(st);
+          Serial.println(I);
+      }
       st[idx]=buff[i];
       i++;
       idx++;
@@ -332,8 +367,8 @@ void task_position_control(void *pvParameters)  // Task PID
     if ((position_in > 1500) && (position_in <= 1900)){ 
     position_in_pot = map(position_in,1500,1900,250,500);
     }
-    Serial.print("Position_in : ");
-    Serial.println(position_in_pot);
+    //Serial.print("Position_in : ");
+    //Serial.println(pwm_LED_communication);
     P = P + Kp_baru;
     I = I + Ki_baru;
     D = D + Kd_baru;
@@ -395,7 +430,13 @@ void task_speed_control(void *pvParameters)  // Task PID
   (void) pvParameters;
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  
+  pwm_LED_power= 255;
+  Serial.print("LED communication : ");
+  Serial.println(pwm_LED_communication);
+  //analogWrite(pin_LED_power, pwm_LED_power);
+  //if (pwm_LED_communication > 0){
+  //analogWrite(pin_LED_communication, 255);
+  //}
   int countE, countF;
   for (;;)
   {
@@ -474,6 +515,61 @@ void TaskRPM(void *pvParameters)  // Task khusus RPM
     rpm_engine = speed_1.calcRPM();
     rpm_prop = speed_2.calcRPM();
     rpm_pump = speed_3.calcRPM();
+    vTaskDelayUntil( &xLastWakeTime, 1);
+  }
+}
+
+void TaskManual(void *pvParameters)  // Task khusus Manuak
+{
+  (void) pvParameters;
+  TickType_t xLastWakeTime;
+  xLastWakeTime = xTaskGetTickCount();
+  int countG, countH;
+  for (;;)
+  {
+    Serial.println(not(digitalRead(pin_button_left)));
+    analogWrite(pwm_pressure,255);
+    analogWrite(pin_LED_communication, 0);
+    analogWrite(pin_LED_power, 0);
+    rpm_engine = speed_1.calcRPM();
+    rpm_prop = speed_2.calcRPM();
+    rpm_pump = speed_3.calcRPM();
+    //manual_state = digitalRead(pin_maunal);
+    //boom_steer_state = digitalRead(pin_steer_boom);
+    manual_state = 1;
+    boom_steer_state = 1;
+    if (manual_state  == 0){
+      //do nothing
+      Serial.println("Auto");
+    }
+    else if (manual_state == 1){
+      if (boom_steer_state == 1){//steer
+        if(not(digitalRead(pin_button_speed)) == 1){
+          analogWrite(pin_LED_communication, 255);
+          analogWrite(pin_LED_power, 0);
+          Serial.println("left");
+          //analogWrite(direct_valve_1_1,255);
+          //analogWrite(direct_valve_1_2,0);
+        }
+        else if(not(digitalRead(pin_button_right)) == 1){
+          analogWrite(pin_LED_power, 255);
+          analogWrite(pin_LED_communication, 0);
+          //analogWrite(direct_valve_1_1,0);
+          //analogWrite(direct_valve_1_2,255);
+        }
+      }
+      else if (digitalRead(pin_steer_boom) == 1){//boom
+        if(digitalRead(pin_button_left) == 1){
+         // analogWrite(direct_valve_1_1,255);
+         // analogWrite(direct_valve_1_2,0);
+        }
+        else if(digitalRead(pin_button_right) == 1){
+        //  analogWrite(direct_valve_1_1,0);
+        //  analogWrite(direct_valve_1_2,255);
+        }
+      }
+    }
+    
     vTaskDelayUntil( &xLastWakeTime, 1);
   }
 }
