@@ -33,6 +33,7 @@ PubSubClient client(espClient);
 #define Kp_ID 'P'
 #define Ki_ID 'I'
 #define Kd_ID 'D'
+#define communication_ID 'C'
 
 // Fuel Tank Level, Steer, Depth, and PWM
 int level_tanki = 0;
@@ -182,6 +183,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     client.publish("1Fuel",dtostrf(level_tanki, 2, 0, buf));
     client.publish("1Azimuth",dtostrf(azimuth, 2, 0, buf));
     client.publish("1Box","connected");
+    sprintf(buf_Tx,"\t%dC\t\n",255);
+    Serial.println(buf_Tx);
+    mySerial.print(buf_Tx);
   }
 }
 
