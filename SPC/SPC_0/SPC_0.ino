@@ -1,9 +1,10 @@
 //Wiring Guide
 //Using Arduino Mega 2560
 //LCD 20x4 I2C: SDA -> PIN 20; SCL -> PIN 21; 
-/* 
+/* Mukhtar Amin
  *  Mochamad Teguh Subarkah
- */
+ *  Aji Chairul Anwar
+  */
 
 //LIBRARIES
 #include <SPI.h>
@@ -433,7 +434,7 @@ void task_speed_control(void *pvParameters)  // Task PID
   pwm_LED_power= 255;
   Serial.print("LED communication : ");
   Serial.println(pwm_LED_communication);
-  //analogWrite(pin_LED_power, pwm_LED_power);
+  analogWrite(pin_LED_power, pwm_LED_power);
   //if (pwm_LED_communication > 0){
   //analogWrite(pin_LED_communication, 255);
   //}
@@ -529,15 +530,15 @@ void TaskManual(void *pvParameters)  // Task khusus Manuak
   {
     Serial.println(not(digitalRead(pin_button_left)));
     analogWrite(pwm_pressure,255);
-    analogWrite(pin_LED_communication, 0);
-    analogWrite(pin_LED_power, 0);
+    //analogWrite(pin_LED_communication, 0);
+    //analogWrite(pin_LED_power, 0);
     rpm_engine = speed_1.calcRPM();
     rpm_prop = speed_2.calcRPM();
     rpm_pump = speed_3.calcRPM();
     //manual_state = digitalRead(pin_maunal);
     //boom_steer_state = digitalRead(pin_steer_boom);
-    manual_state = 1;
-    boom_steer_state = 1;
+    manual_state = 0;
+    boom_steer_state = 0;
     if (manual_state  == 0){
       //do nothing
       Serial.println("Auto");
