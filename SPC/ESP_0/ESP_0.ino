@@ -1,4 +1,4 @@
-/* 
+/*  Aji Chairul Anwar
  *  Mochamad Teguh Subarkah
  */
 
@@ -34,12 +34,13 @@ PubSubClient client(espClient);
 #define Ki_ID 'I'
 #define Kd_ID 'D'
 #define communication_ID 'C'
+#define boom_ID 'B'
 
 // Fuel Tank Level, Steer, Depth, and PWM
 int level_tanki = 0;
 int steer = 0;
 int depth = 0;
-
+int boom = 0;
 int pwm1;
 int pwm2;
 
@@ -140,16 +141,22 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
   
   if(strcmp(topic,"spc_speed1") == 0){
-    client.publish("confirm_speed2","Received");
+    client.publish("confirm_speed1","Received");
     Speed = value;
     sprintf(buf_Tx,"\t%dS\t\n",Speed);
     mySerial.print(buf_Tx);
   } 
   if(strcmp(topic,"spc_steer1") == 0){
-    client.publish("confirm_steer2","Received");
+    client.publish("confirm_steer1","Received");
     steer = value;
     sprintf(buf_Tx,"\t%dR\t\n",steer);
     Serial.println(buf_Tx);
+    mySerial.print(buf_Tx);
+  }
+  if(strcmp(topic,"boom1") == 0){
+    client.publish("confirm_boom1","Received");
+    boom = value;
+    sprintf(buf_Tx,"\t%dB\t\n",boom);
     mySerial.print(buf_Tx);
   }
   if(strcmp(topic,"steer1_kp") == 0){
@@ -208,6 +215,7 @@ void reconnect() {
       // ... and resubscribe
       client.subscribe("spc_speed1");
       client.subscribe("spc_steer1");
+      client.subscribe("boom1");
       client.subscribe("steer1_kp");
       client.subscribe("steer1_ki");
       client.subscribe("steer1_kd");
