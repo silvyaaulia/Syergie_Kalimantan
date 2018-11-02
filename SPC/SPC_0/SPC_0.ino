@@ -296,47 +296,47 @@ void TaskSerial(void *pvParameters)  // Task Serial
           dtostrf(0, 10, 0, st);
       }
       else if(buff[i]==speed_ID){
-          Serial.print("Speed = ");
+          //Serial.print("Speed = ");
           Speed = atoi(st);
-          Serial.println(Speed);
+          //Serial.println(Speed);
       }
       else if(buff[i]==steer_ID){
-          Serial.print("Steer = ");
+          //Serial.print("Steer = ");
           position_in = atoi(st);
-          Serial.println(atoi(st));
+          //Serial.println(atoi(st));
       }
       else if(buff[i]==Kp_ID){
-          Serial.print("Kp = ");
+          //Serial.print("Kp = ");
           Kp_baru = atof(st);
-          Serial.println(P);
+          //Serial.println(P);
       }
       else if(buff[i]==Kd_ID){
-          Serial.print("Kd = ");
+          //Serial.print("Kd = ");
           Kd_baru  = atof(st);
-          Serial.println(D);
+          //Serial.println(D);
       }
       else if(buff[i]==Ki_ID){
-          Serial.print("Ki = ");
+          //Serial.print("Ki = ");
           Ki_baru = atof(st);
-          Serial.println(I);
+          //Serial.println(I);
       }
       else if(buff[i]==communication_ID){
-          Serial.print("LED Com = ");
+          //Serial.print("LED Com = ");
           pwm_LED_communication = atoi(st);
-          Serial.println(I);
+          //Serial.println(I);
       }
       else if(buff[i]==boom_ID){
-          Serial.print("boom = ");
+          //Serial.print("boom = ");
           boom = atoi(st);
-          Serial.println(I);
+          //Serial.println(I);
       }
       st[idx]=buff[i];
       i++;
       idx++;
     }
     else{
-      Serial.print("No Data Serial #");
-      Serial.println(counter);
+      //Serial.print("No Data Serial #");
+      //Serial.println(counter);
     }
 
     Serial3.print("\t");
@@ -451,8 +451,8 @@ void task_speed_control(void *pvParameters)  // Task PID
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
   pwm_LED_power= 255;
-  Serial.print("LED communication : ");
-  Serial.println(pwm_LED_communication);
+  //Serial.print("LED communication : ");
+  //Serial.println(pwm_LED_communication);
   analogWrite(pin_LED_power, pwm_LED_power);
   //if (pwm_LED_communication > 0){
   //analogWrite(pin_LED_communication, 255);
@@ -460,7 +460,7 @@ void task_speed_control(void *pvParameters)  // Task PID
   int countE, countF;
   for (;;)
   {
-    Serial.print("Speed =  ");
+    //Serial.print("Speed =  ");
     
     if (Speed == 1500){
       pwm_out = 0;
@@ -478,7 +478,7 @@ void task_speed_control(void *pvParameters)  // Task PID
       pwm_out = 255;
     }
     
-    Serial.println(pwm_out);
+    //Serial.println(pwm_out);
     analogWrite(4,255);
     analogWrite(5,pwm_out);
 
@@ -554,28 +554,30 @@ void TaskManual(void *pvParameters)  // Task khusus Manual
     rpm_engine = speed_1.calcRPM();
     rpm_prop = speed_2.calcRPM();
     rpm_pump = speed_3.calcRPM();
-    manual_state = digitalRead(pin_manual);
-    boom_steer_state = digitalRead(pin_steer_boom);
+    manual_state = not(digitalRead(pin_manual));    
+    boom_steer_state = not(digitalRead(pin_steer_boom));
     button_speed = not(digitalRead(pin_button_speed));
     button_left  = not(digitalRead(pin_button_left));
     button_right = not(digitalRead(pin_button_right));
+    Serial.println(button_left);
     if (manual_state  == 0){
       //do nothing
-      Serial.println("Autopilot");
+      Serial.println("Remote");
     }
     else if (manual_state == 1){
       if (boom_steer_state == 1){//steer
+        Serial.println("Steer");
         if((button_left) == 1){
           analogWrite(pin_LED_communication, 255);
-          analogWrite(pin_LED_power, 0);
-          Serial.println("left");
+          //analogWrite(pin_LED_power, 0);
+          //Serial.println("left");
           //analogWrite(direct_valve_1_1,255);
           //analogWrite(direct_valve_1_2,0);
         }
         else if(button_right == 1){
-          analogWrite(pin_LED_power, 255);
+          //analogWrite(pin_LED_power, 255);
           analogWrite(pin_LED_communication, 0);
-          Serial.println("right");
+          //Serial.println("right");
           //analogWrite(direct_valve_1_1,0);
           //analogWrite(direct_valve_1_2,255);
         }
@@ -583,12 +585,12 @@ void TaskManual(void *pvParameters)  // Task khusus Manual
       else if (boom_steer_state == 0){//boom
         if(button_left == 1){
          analogWrite(pin_LED_communication, 255);
-         analogWrite(pin_LED_power, 0);
+         //analogWrite(pin_LED_power, 0);
          // analogWrite(pin_boom_up,255);
          // analogWrite(pin_boom_down,0);
         }
         else if(digitalRead(pin_button_right) == 1){
-        analogWrite(pin_LED_power, 255);
+        //analogWrite(pin_LED_power, 255);
         analogWrite(pin_LED_communication, 0);
         // analogWrite(pin_boom_up,0);
         // analogWrite(pin_boom_down,255);
