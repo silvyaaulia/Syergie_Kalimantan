@@ -1,4 +1,4 @@
-/* Draft Syergie Main Control 
+/* Draft Syergie Main Control (v.9)
  * 01/11/2018
 ----------------------------------------
 NN:
@@ -29,6 +29,9 @@ Tunning:
 ----------------------------------------
 Delay with time sampling
 ----------------------------------------
+Winch:
+> winch per propeller
+----------------------------------------
 */
 
 /* Library math */
@@ -38,8 +41,6 @@ Delay with time sampling
 #include <SPI.h>
 #include <Ethernet.h>
 #include <PubSubClient.h>
-
-
 
 // Joystick 
 #define joy_speed_left A8       //input main speed-left (front and back)
@@ -51,7 +52,11 @@ Delay with time sampling
 #define joy_tunning1 A5         
 #define joy_tunning2 A4         
 #define joy_tunning3 A3         
-#define joy_tunning4 A2         
+#define joy_tunning4 A2        
+#define joy_winch1 A10         
+#define joy_winch2 A11         
+#define joy_winch3 A12         
+#define joy_winch4 A13
 
 // Initialize state joystick
 int speed_left = 0;             
@@ -66,6 +71,11 @@ int tunning1 = 0;
 int tunning2 = 0;
 int tunning3 = 0;
 int tunning4 = 0;
+
+int winch1 = 0;
+int winch2 = 0;
+int winch3 = 0;
+int winch4 = 0;
 
 // Pin Switch
 //Switch utama
@@ -294,6 +304,21 @@ double pulse_tunning_d(int joytune_3) {
   return tunning_3;
 }
 
+/* Winch Function */
+double pulse_winch(int joy_winch) {
+  double winch;
+  if (joy_winch <=150){
+    winch = 1100;
+   }
+  else if (joy_winch >=850){
+    winch = 1900;
+   }
+   else{
+    winch = 0;
+   }
+  return winch;
+}
+
 void setup() {
   // Serial begin
   Serial.begin(57600);
@@ -340,9 +365,10 @@ void loop() {
   char msgBuffer[20];
   int pulse_speed_in_left, pulse_speed_in_right;
   int pulse_steer_in_left, pulse_steer_in_right;
+  int pulse_winch1, pulse_winch2, pulse_winch3, pulse_winch4;
   int pulse_tunning1, pulse_tunning2;
   double kp1, kd1, kp2, kd2,kp3, kd3, kp4, kd4, ki1, ki2, ki3,ki4, xx;
-
+  double w1, w2, w3, w4;
   
  if (!client.connected()) {
    reconnect();
@@ -596,6 +622,23 @@ void loop() {
      }
     //Serial.println(pulse_pixhawk);
     }
+
+
+    //Winch Control
+    winch1 = analogRead(joy_winch1);
+    winch2 = analogRead(joy_winch2);
+    winch3 = analogRead(joy_winch3);
+    winch4 = analogRead(joy_winch4);
+    pulse_winch1 = pulse_winch(winch1);
+    pulse_winch2 = pulse_winch(winch2);
+    pulse_winch3 = pulse_winch(winch3);
+    pulse_winch4 = pulse_winch(winch4);    
+    client.publish("spc_winch1",dtostrf(pulse_winch1, 4, 0, msgBuffer));
+    client.publish("spc_winch2",dtostrf(pulse_winch1, 4, 0, msgBuffer));
+    client.publish("spc_winch3",dtostrf(pulse_winch1, 4, 0, msgBuffer));
+    client.publish("spc_winch4",dtostrf(pulse_winch1, 4, 0, msgBuffer));
+
+    
   client.loop();
   if (state_control == 0){
   time_sampling = 10;

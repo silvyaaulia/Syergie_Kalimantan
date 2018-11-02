@@ -603,5 +603,5 @@ void loop() {
   if (state_control == 1){
   time_sampling = 1000;
   }
-  delay(10); 
+  delay(time_sampling); 
 }
