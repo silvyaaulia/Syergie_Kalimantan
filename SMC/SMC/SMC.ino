@@ -1,5 +1,5 @@
 /* Draft Syergie Main Control 
- * 22/10/2018
+ * 31/10/2018
 ----------------------------------------
 NN:
 on   : publish from laptop
@@ -91,6 +91,12 @@ int state_steer1 = 0;                  //state steer
 int state_steer2 = 0;
 int state_steer3 = 0;
 int state_steer4 = 0;
+
+/* Control State */
+int state_control;
+
+/* TIme Sampling*/
+int time_sampling;
 
 // LED Indikator
 //int led_nn;                  //output nn
@@ -372,7 +378,7 @@ void loop() {
     digitalWrite(led_main, HIGH);
     Serial.println();
     Serial.println("Manual Mode");
-
+       state_control = 0;
     /*Tunning*/
     int state_tunning = digitalRead(switch_tunning); // input swicth main
     if (state_tunning == LOW) {
@@ -521,6 +527,7 @@ void loop() {
       }
     }
    }
+
   }
   // Switch Main : off
   // Input smc dari pixhawk 
@@ -528,7 +535,8 @@ void loop() {
     digitalWrite(led_main, LOW);
     Serial.println();  
     Serial.println("Pixhawk Mode");
-      
+    state_control = 1;
+    
 
     // Pixhawk process , Teguh, 16/10/2018
     pulse_pixhawk_1 = pulseIn(pixhawk_1, HIGH);
@@ -589,5 +597,11 @@ void loop() {
     //Serial.println(pulse_pixhawk);
     }
   client.loop();
-  delay(1000); 
+  if (state_control == 0){
+  time_sampling = 10;
+  }
+  if (state_control == 1){
+  time_sampling = 1000;
+  }
+  delay(10); 
 }
