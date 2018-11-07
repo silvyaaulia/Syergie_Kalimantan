@@ -1,10 +1,10 @@
 //Test winch
 //01/11/18
 
-#define potensio1 A5         
-#define potensio2 A4         
-#define potensio3 A3         
-#define potensio4 A2            
+#define potensio1 A10         
+#define potensio2 A11        
+#define potensio3 A12         
+#define potensio4 A13            
 
 int winch1 = 0;
 int winch2 = 0;
@@ -56,7 +56,7 @@ void loop() {
         Serial.print(" winch3: ");
         Serial.print(w3);
         Serial.print(" winch4: ");
-        Serial.print(w4);
+        Serial.println(w4);
         
        delay(1000);
  } 

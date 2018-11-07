@@ -1,5 +1,5 @@
 //Test_steer_function
-//18/10/2018
+//07/11/2018
 
 #define joy0 A0         //steer kanan x
 #define joy1 A1         //steer kanan y
@@ -47,8 +47,12 @@ double pulse_steer(int x, int y) {
            pulse_steer_in = 1500;
            //derajat = 0; 
       }
+      else if (y >= 500){
+           pulse_steer_in = 0;
+           //tengah;
+      }
       else{
-          pulse_steer_in = 0;
+          pulse_steer_in = 1100;
       }
   }
   else  if (x > 800){

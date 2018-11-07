@@ -1,5 +1,5 @@
 /* Draft Syergie Main Control 
- * 01/11/2018
+ * 07/11/2018
 ----------------------------------------
 NN:
 on   : publish from laptop
@@ -75,11 +75,11 @@ const int switch_tunning = 8;          // input swicth main
 const int switch_speed_left = 5;  
 const int switch_speed_right = 28; 
 const int switch_steer_left = 4;  
-const int switch_steer_right = 30;  
-const int switch_steer1 = 36;           //tunning steer 1
-const int switch_steer2 = 37;           //tunning steer 2
-const int switch_steer3 = 38;           //tunning steer 3
-const int switch_steer4 = 39;           //tunning steer 4
+const int switch_steer_right = 29;  
+const int switch_steer1 = 24;           //tunning steer 1
+const int switch_steer2 = 25;           //tunning steer 2
+const int switch_steer3 = 26;           //tunning steer 3
+const int switch_steer4 = 27;           //tunning steer 4
 
 // Initialize State Switch
 int state_nn = 0;                      //state nn
@@ -197,7 +197,7 @@ double pulse_speed(int joyspeed) {
   return pulse_speed_in;
 }
 
-/* Steer Function */
+// Steer Function
 double pulse_steer(int x, int y) {
   double pulse_steer_in;
   if (x <= 400){
@@ -222,8 +222,12 @@ double pulse_steer(int x, int y) {
            pulse_steer_in = 1500;
            //derajat = 0; 
       }
+      else if (y >= 500){
+           pulse_steer_in = 0;
+           //tengah;
+      }
       else{
-          pulse_steer_in = 0;
+          pulse_steer_in = 1100;
       }
   }
   else  if (x > 800){
@@ -344,9 +348,9 @@ void loop() {
   double kp1, kd1, kp2, kd2,kp3, kd3, kp4, kd4, ki1, ki2, ki3,ki4, xx;
 
   
- if (!client.connected()) {
+ /*if (!client.connected()) {
    reconnect();
-  }
+  }*/
 
  /*NN
   state_nn = digitalRead (switch_nn);
@@ -596,12 +600,15 @@ void loop() {
      }
     //Serial.println(pulse_pixhawk);
     }
-  client.loop();
+ 
+  /*client.loop();
   if (state_control == 0){
   time_sampling = 10;
   }
   if (state_control == 1){
   time_sampling = 1000;
   }
-  delay(time_sampling); 
+  delay(time_sampling); */
+
+  delay(1000);
 }

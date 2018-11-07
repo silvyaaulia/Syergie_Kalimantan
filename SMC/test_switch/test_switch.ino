@@ -1,9 +1,9 @@
 //Test_switch 
-//18/10/18
+//07/11/18
 
 
 //Pin Switch
-const int switch_nn = 6;
+const int switch_winch = 6;
 const int switch_manual = 7;           // input swicth main
 const int switch_tunning = 8;          // input swicth main
 
@@ -20,7 +20,7 @@ const int switch_steer4 = 39;           //tunning steer 4
 
 
 // Initialize State Switch
-int state_nn = 0;                      //state nn
+int state_winch = 0;                      //state nn
 int state_manual = 0;                  //state manual
 int state_tunning = 0;                 //state tunning
 
@@ -50,8 +50,8 @@ void setup() {
   digitalWrite(switch_steer_left, HIGH);
   digitalWrite(switch_steer_right, HIGH);
 
-  pinMode(switch_nn ,INPUT);
-  analogWrite(switch_nn ,255);
+  pinMode(switch_winch ,INPUT);
+  analogWrite(switch_winch ,255);
   pinMode(switch_manual ,INPUT);
   analogWrite(switch_manual ,255);
   pinMode(switch_tunning ,INPUT);
@@ -70,11 +70,11 @@ void setup() {
 }
 
 void loop() {
-      state_nn = digitalRead(switch_nn);
+      state_winch = digitalRead(switch_winch);
       state_manual = digitalRead(switch_manual);
       state_tunning = digitalRead(switch_tunning);
-      Serial.print("nn:");
-      Serial.print(state_nn);
+      Serial.print("winch:");
+      Serial.print(state_winch);
       Serial.print("  manual:");
       Serial.print(state_manual);
       Serial.print("  tunning:");
