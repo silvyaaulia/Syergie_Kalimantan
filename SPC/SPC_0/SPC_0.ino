@@ -559,7 +559,7 @@ void TaskManual(void *pvParameters)  // Task khusus Manual
     button_speed = not(digitalRead(pin_button_speed));
     button_left  = not(digitalRead(pin_button_left));
     button_right = not(digitalRead(pin_button_right));
-    Serial.println(button_left);
+    Serial.println(button_right);
     if (manual_state  == 0){
       //do nothing
       Serial.println("Remote");
