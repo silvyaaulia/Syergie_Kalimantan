@@ -1,4 +1,4 @@
-/* Draft Syergie Main Control 
+/* Draft Syergie Main Control (v.9)
  * 07/11/2018
 ----------------------------------------
 NN:
@@ -29,6 +29,9 @@ Tunning:
 ----------------------------------------
 Delay with time sampling
 ----------------------------------------
+Winch:
+> winch per propeller
+----------------------------------------
 */
 
 /* Library math */
@@ -39,11 +42,9 @@ Delay with time sampling
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
-
-
 // Joystick 
-#define joy_speed_left A8       //input main speed-left (front and back)
-#define joy_speed_right A9      //input main speed-right (front and back)
+#define joy_speed_left A9       //input main speed-left (front and back)
+#define joy_speed_right A8      //input main speed-right (front and back)
 #define joy_steer_leftx A6       
 #define joy_steer_lefty A7       
 #define joy_steer_rightx A0      
@@ -51,7 +52,11 @@ Delay with time sampling
 #define joy_tunning1 A5         
 #define joy_tunning2 A4         
 #define joy_tunning3 A3         
-#define joy_tunning4 A2         
+#define joy_tunning4 A2        
+#define joy_winch1 A10         
+#define joy_winch2 A11         
+#define joy_winch3 A12         
+#define joy_winch4 A13
 
 // Initialize state joystick
 int speed_left = 0;             
@@ -67,9 +72,14 @@ int tunning2 = 0;
 int tunning3 = 0;
 int tunning4 = 0;
 
+int winch1 = 0;
+int winch2 = 0;
+int winch3 = 0;
+int winch4 = 0;
+
 // Pin Switch
 //Switch utama
-const int switch_nn = 6;
+const int switch_winch = 6;
 const int switch_manual = 7;           // input swicth main
 const int switch_tunning = 8;          // input swicth main
 const int switch_speed_left = 5;  
@@ -82,7 +92,7 @@ const int switch_steer3 = 26;           //tunning steer 3
 const int switch_steer4 = 27;           //tunning steer 4
 
 // Initialize State Switch
-int state_nn = 0;                      //state nn
+int state_winch = 0;                      //state winch
 int state_manual = 0;                  //state manual
 int state_tunning = 0;                 //state tunning
 int state_steer_left = 0;              //front left
@@ -100,10 +110,6 @@ int state_control;
 /* TIme Sampling*/
 int time_sampling;
 
-// LED Indikator
-//int led_nn;                  //output nn
-//int led_main;                //output manual or pixhawk
-//int led_tunning;             //output tunning
 
 int led_steer1;                //output tunning steer
 int led_steer2;
@@ -111,12 +117,12 @@ int led_steer3;
 int led_steer4;
 
 // Pin LED Indikator
-const int led_nn;                  //output nn
+const int led_winch;                  //output nn
 const int led_main = 13;                //output manual or pixhawk
 const int led_tunning;             //output tunning
 
 //Pulse
-double nn_speed_in;
+//double nn_speed_in;
 
 // Pixhawk ,edited 16/10/2018 , Teguh
 const int pixhawk_1 = 23;
@@ -298,13 +304,28 @@ double pulse_tunning_d(int joytune_3) {
   return tunning_3;
 }
 
+/* Winch Function */
+double pulse_winch(int joy_winch) {
+  double winch;
+  if (joy_winch <=200){
+    winch = 1100;
+   }
+  else if (joy_winch >=800){
+    winch = 1900;
+   }
+   else{
+    winch = 1500;
+   }
+  return winch;
+}
+
 void setup() {
   // Serial begin
   Serial.begin(57600);
 
   // Switch
-  pinMode(switch_nn ,INPUT);                  //switch UTAMA
-  analogWrite(switch_nn ,255);
+  pinMode(switch_winch ,INPUT);                  //switch UTAMA
+  analogWrite(switch_winch ,255);
   pinMode(switch_tunning ,INPUT);
   analogWrite(switch_tunning ,255);
   pinMode(switch_manual ,INPUT);
@@ -329,7 +350,7 @@ void setup() {
   analogWrite(switch_steer3, 255);
   analogWrite(switch_steer4, 255);
 
-  //pinMode(led_nn, OUTPUT);
+  //pinMode(led_winch, OUTPUT);
   pinMode(led_main, OUTPUT);
 
   // Ethernet
@@ -344,38 +365,39 @@ void loop() {
   char msgBuffer[20];
   int pulse_speed_in_left, pulse_speed_in_right;
   int pulse_steer_in_left, pulse_steer_in_right;
+  int pulse_winch1, pulse_winch2, pulse_winch3, pulse_winch4;
   int pulse_tunning1, pulse_tunning2;
   double kp1, kd1, kp2, kd2,kp3, kd3, kp4, kd4, ki1, ki2, ki3,ki4, xx;
-
+  double w1, w2, w3, w4;
   
  /*if (!client.connected()) {
    reconnect();
   }*/
 
- /*NN
-  state_nn = digitalRead (switch_nn);
-  if (state_nn == LOW){
-    //LED indikator blink 
-    digitalWrite(led_main, HIGH);     // turn the LED on (HIGH is the voltage level)
-    delay(500);                       // wait for a second
-    digitalWrite(led_main, LOW);      // turn the LED off by making the voltage LOW
-    delay(500);                       // wait for a second
-    // switch on, indicator on:
-    // client.subscribe("switch_nn");
-    client.publish("switch_nn", "NN_on");
-    Serial.println(" ");
-    Serial.println(" NN:on");
-  }
-  else{
-    client.publish("switch_nn", "NN_off");
-    Serial.println(" ");
-    Serial.println(" NN:off");
-  }
-  */
+    /*Winch Control*/
+    state_winch = digitalRead (switch_winch);
+    if (state_winch == LOW){
+      Serial.println(" Winch:on");
+      winch1 = analogRead(joy_winch1);
+      winch2 = analogRead(joy_winch2);
+      winch3 = analogRead(joy_winch3);
+      winch4 = analogRead(joy_winch4);
+      pulse_winch1 = pulse_winch(winch1);
+      pulse_winch2 = pulse_winch(winch2);
+      pulse_winch3 = pulse_winch(winch3);
+      pulse_winch4 = pulse_winch(winch4);
+      Serial.print(" winch1: "); Serial.print(pulse_winch1);
+      Serial.print(" winch2: "); Serial.print(pulse_winch2);
+      Serial.print(" winch3: "); Serial.print(pulse_winch3);
+      Serial.print(" winch4: "); Serial.println(pulse_winch4);    
+      client.publish("spc_winch1",dtostrf(pulse_winch1, 4, 0, msgBuffer));
+      client.publish("spc_winch2",dtostrf(pulse_winch2, 4, 0, msgBuffer));
+      client.publish("spc_winch3",dtostrf(pulse_winch3, 4, 0, msgBuffer));
+      client.publish("spc_winch4",dtostrf(pulse_winch4, 4, 0, msgBuffer));
+    }
+  
 
-  /* Main */
- // bisa jalan kalo gaada input dari pc dan switch nn off
- // input smc dari joystick
+  /* Manual */
  state_manual = digitalRead (switch_manual);
 
   //Switch Main : on
@@ -417,7 +439,7 @@ void loop() {
         client.publish("steer1_kp",dtostrf(kp1, 4, 2, msgBuffer));
         client.publish("steer1_ki",dtostrf(ki1, 6, 4, msgBuffer));
         client.publish("steer1_kd",dtostrf(kd1, 4, 2, msgBuffer));
-        } 
+      } 
 
       // switch tunning 2 on
       if (state_steer1 == HIGH && state_steer2 == LOW && state_steer3 == HIGH && state_steer4 == HIGH) {
@@ -434,7 +456,7 @@ void loop() {
         client.publish("steer1_kp",dtostrf(kp2, 4, 2, msgBuffer));
         client.publish("steer1_ki",dtostrf(ki2, 5, 4, msgBuffer));
         client.publish("steer1_kd",dtostrf(kd2, 4, 2, msgBuffer));
-        }
+      }
 
      // switch tunning 3 on
      if (state_steer1 == HIGH && state_steer2 == HIGH && state_steer3 == LOW && state_steer4 == HIGH) {
@@ -451,11 +473,11 @@ void loop() {
        client.publish("steer1_kp",dtostrf(kp3, 4, 2, msgBuffer));
        client.publish("steer1_ki",dtostrf(ki3, 6, 4, msgBuffer));
        client.publish("steer1_kd",dtostrf(kd3, 4, 2, msgBuffer));
-       }
+     }
  
     // switch tunning 4 on
     if (state_steer1 == HIGH && state_steer2 == HIGH && state_steer3 == HIGH && state_steer4 == LOW) {
-      Serial.println(" T.Steer4: ");
+      Serial.print(" T.Steer4: ");
       kp4 = pulse_tunning_p(tunning1);
       ki4 = pulse_tunning_i(tunning2);
       kd4 = pulse_tunning_d(tunning3);
@@ -468,7 +490,7 @@ void loop() {
       client.publish("steer1_kp",dtostrf(kp4, 4, 2, msgBuffer));
       client.publish("steer1_ki",dtostrf(ki4, 6, 4, msgBuffer));
       client.publish("steer1_kd",dtostrf(kd4, 4, 2, msgBuffer));
-      }
+    }
     
     Serial.println();
     }
@@ -492,8 +514,8 @@ void loop() {
     }
     //Speed Control Right
     if (state_speed_right == LOW) {
-      //speed_right = analogRead(joy_speed_right);
-      speed_right = analogRead(joy_tunning3);      //testing
+      speed_right = analogRead(joy_speed_right);
+      //speed_right = analogRead(joy_tunning3);      //testing
       delay(100);
       Serial.print(" Speed right: ");
       pulse_speed_in_right = pulse_speed(speed_right);
@@ -600,8 +622,11 @@ void loop() {
      }
     //Serial.println(pulse_pixhawk);
     }
- 
-  /*client.loop();
+
+
+   
+  client.loop();
+  /*
   if (state_control == 0){
   time_sampling = 10;
   }

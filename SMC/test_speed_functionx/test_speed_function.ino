@@ -1,11 +1,11 @@
 //test_speed_function 
 //07/11/2018
 
-#define joyl A3
-#define joyr A5
+#define joy3 A3
+#define joy5 A5
 
-int potensiol = 0;
-int potensior = 0;
+int potensio3 = 0;
+int potensio5 = 0;
 
 /* Speed Function */
 double pulse_speed(int joyspeed) {
@@ -40,21 +40,22 @@ void loop() {
 
         //speed kiri
         Serial.print("   A5: ");
-        potensiol = analogRead(joyl);
-        Serial.print(potensiol);
-        pulse_speed_in_left = pulse_speed(potensiol);
+        potensio5 = analogRead(joy5);
+        Serial.print(potensio5);
+        pulse_speed_in_left = pulse_speed(potensio5);
 
         //speed kanan
         Serial.print("    A3: ");
-        potensior = analogRead(joyr);
-        Serial.println(potensior);
-        pulse_speed_in_right = pulse_speed(potensior);
+        potensio3 = analogRead(joy3);
+        Serial.println(potensio3);
+        pulse_speed_in_right = pulse_speed(potensio3);
 
 
         Serial.print("   ");
         Serial.print(pulse_speed_in_left);
         Serial.print("      ");
         Serial.println(pulse_speed_in_right);
+
 
         delay (1000);
 
