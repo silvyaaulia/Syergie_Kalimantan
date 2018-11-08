@@ -281,9 +281,9 @@ void TaskSerial(void *pvParameters)  // Task Serial
           dtostrf(0, 10, 0, st);
       }
       else if(buff[i]==speed_ID){
-          Serial.print("Speed = ");
+          //Serial.print("Speed = ");
           Speed = atoi(st);
-          Serial.println(Speed);
+          //Serial.println(Speed);
       }
       else if(buff[i]==steer_ID){
           Serial.print("Steer = ");
@@ -361,6 +361,45 @@ void task_position_control(void *pvParameters)  // Task PID
   int countE, countF;
   for (;;)
   {
+    if (manual_state == 1){
+      //Serial.print("Manual to the ");
+      if (boom_steer_state == 1){//steer
+        analogWrite(direct_valve_1_1,0);
+        analogWrite(direct_valve_1_2,0);
+        if(not(digitalRead(pin_button_left)) == 1){
+          // LED hanya utk Testing
+          //analogWrite(pin_LED_communication, 255);
+          //analogWrite(pin_LED_power, 0);
+          Serial.println("left");
+          //analogWrite(direct_valve_1_1,255);
+          //analogWrite(direct_valve_1_2,0);
+        }
+        else if(not(digitalRead(pin_button_right)) == 1){
+          // LED hanya utk Testing
+          //analogWrite(pin_LED_power, 255);
+          //analogWrite(pin_LED_communication, 0);
+          Serial.println("Right");
+          //analogWrite(direct_valve_1_1,0);
+          //analogWrite(direct_valve_1_2,255);
+        }
+        
+      }
+      else if (boom_steer_state == 0){//boom
+         analogWrite(boom_up,0);
+         analogWrite(boom_down,0);
+      if(digitalRead(pin_button_left) == 1){
+         // analogWrite(boom_up,255);
+         // analogWrite(boom_down,0);
+        }
+        else if(digitalRead(pin_button_right) == 1){
+        //  analogWrite(boom_up,0);
+        //  analogWrite(boom_down,255);
+        }
+      
+      //do nothing
+      }
+    }
+    else if (manual_state == 0){
     if ((position_in >= 1100) && (position_in <= 1500)){ 
     position_in_pot = map(position_in,1100,1500,0,250);
     }
@@ -419,7 +458,7 @@ void task_position_control(void *pvParameters)  // Task PID
       analogWrite(direct_valve_1_2, 0);
     }
     Last = position_out; // untuk mencari derivatif
-    
+    }
     // Delay sebesar 11 tick ~ 198 ms
     vTaskDelayUntil( &xLastWakeTime, 11);
   }
@@ -431,8 +470,8 @@ void task_speed_control(void *pvParameters)  // Task PID
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
   pwm_LED_power= 255;
-  Serial.print("LED communication : ");
-  Serial.println(pwm_LED_communication);
+  //Serial.print("LED communication : ");
+  //Serial.println(pwm_LED_communication);
   //analogWrite(pin_LED_power, pwm_LED_power);
   //if (pwm_LED_communication > 0){
   //analogWrite(pin_LED_communication, 255);
@@ -440,8 +479,14 @@ void task_speed_control(void *pvParameters)  // Task PID
   int countE, countF;
   for (;;)
   {
-    Serial.print("Speed =  ");
-    
+    //Serial.print("Speed =  ");
+    //Serial.print("State Control ");
+    if (manual_state == 1){
+      //Serial.print("Manual, with PWM = ");
+      pwm_out = 200;
+    }
+    else if (manual_state == 0){
+      //Serial.println("Remote");
     if (Speed == 1500){
       pwm_out = 0;
     }
@@ -457,8 +502,10 @@ void task_speed_control(void *pvParameters)  // Task PID
     if (Speed == 1900){
       pwm_out = 255;
     }
+    }
     
-    Serial.println(pwm_out);
+    
+    //Serial.println(pwm_out);
     analogWrite(4,255);
     analogWrite(5,pwm_out);
 
@@ -484,9 +531,15 @@ void TaskLCD(void *pvParameters)  // Task LCD
     rpm_prop = speed_2.calcRPM();
     rpm_pump = speed_3.calcRPM();
     level_tangki = map(analogRead(pin_level_tanki),0,1023,0,20);
-    sprintf((char*) lcd_buffer0, "RPM Engine: %4d    ", rpm_engine);
-    sprintf((char*) lcd_buffer1, "RPM Propeller: %4d ", rpm_prop);
-    sprintf((char*) lcd_buffer2, "Level Tangki: %2d L  ", level_tangki);
+    if (manual_state == 1){
+    sprintf((char*) lcd_buffer0, "Control Mode: Local    ");  
+    }
+    else if (manual_state == 0){
+    sprintf((char*) lcd_buffer0, "Control Mode: Remote    ");
+    }
+    
+    sprintf((char*) lcd_buffer1, "Engine Rpm: %4d ", rpm_prop);
+    sprintf((char*) lcd_buffer2, "Solar Capacity: %2d L  ", level_tangki);
     sprintf((char*) lcd_buffer3, "Steer:%3d%c Depth:%2dm", steer, 223, depth);
 
     lcd.setCursor(0,0); //Start at character 0 on line 0
@@ -527,7 +580,7 @@ void TaskManual(void *pvParameters)  // Task khusus Manuak
   int countG, countH;
   for (;;)
   {
-    Serial.println(not(digitalRead(pin_button_left)));
+    //Serial.println(not(digitalRead(pin_button_left)));
     analogWrite(pwm_pressure,255);
     analogWrite(pin_LED_communication, 0);
     analogWrite(pin_LED_power, 0);
@@ -537,6 +590,13 @@ void TaskManual(void *pvParameters)  // Task khusus Manuak
     //manual_state = digitalRead(pin_maunal);
     //boom_steer_state = digitalRead(pin_steer_boom);
     manual_state = 1;
+    //Serial.print("State Control ");
+    if (manual_state == 1){
+      //Serial.println("Manual");
+    }
+    else if (manual_state == 0){
+      //Serial.println("Remote");
+    }
     boom_steer_state = 1;
     if (manual_state  == 0){
       //do nothing
