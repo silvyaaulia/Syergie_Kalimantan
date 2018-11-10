@@ -1,6 +1,7 @@
 //Wiring Guide
 //Using Arduino Mega 2560
 //LCD 20x4 I2C: SDA -> PIN 20; SCL -> PIN 21; 
+//ADS1115 I2C : SDA -> SDA; SCL -> SCL;
 /* Mukhtar Amin
  *  Mochamad Teguh Subarkah
  * Aji Chairul Anwar
@@ -26,7 +27,7 @@
 #include <stack_macros.h>
 #include <task.h>
 #include <timers.h>
-#unclude <Adafruit_ADS1015.h>
+#include <Adafruit_ADS1015.h>
 
 //Serial Comunication Transmit Delay
 #define tdelay 1
