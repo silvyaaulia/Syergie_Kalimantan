@@ -1,8 +1,9 @@
 //Wiring Guide
 //Using Arduino Mega 2560
 //LCD 20x4 I2C: SDA -> PIN 20; SCL -> PIN 21; 
-/* 
+/* Mukhtar Amin
  *  Mochamad Teguh Subarkah
+ * Aji Chairul Anwar
  */
 
 //LIBRARIES
@@ -25,6 +26,7 @@
 #include <stack_macros.h>
 #include <task.h>
 #include <timers.h>
+#unclude <Adafruit_ADS1015.h>
 
 //Serial Comunication Transmit Delay
 #define tdelay 1
@@ -70,6 +72,7 @@
 // Set the pins on the I2C chip used for LCD connections:
 //                    addr, en,rw,rs,d4,d5,d6,d7,bl,blpol
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I2C address
+Adafruit_ADS1115 ads(0x48);
 
 // Define Tasks
 void TaskSerial( void *pvParameters );
@@ -164,6 +167,7 @@ void setup() {
   analogWrite(pin_steer_boom, 255);
   analogWrite(pin_manual, 255);
   
+  ads.begin();
   lcd.begin(20,4);         // initialize the lcd for 20 chars 4 lines, turn on backlight
 
   // ------- Quick 3 blinks of backlight  -------------
@@ -423,7 +427,7 @@ void task_position_control(void *pvParameters)  // Task PID
     rpm_engine = speed_1.calcRPM();
     rpm_prop = speed_2.calcRPM();
     rpm_pump = speed_3.calcRPM();
-    double position_out = analogRead(pin_steer);
+    double position_out = ads.readADC_SingleEnded(0);
     // Perhitungan PID
     Error = position_in_pot - position_out;
     Buff = position_out; // untuk mencari derivatif
