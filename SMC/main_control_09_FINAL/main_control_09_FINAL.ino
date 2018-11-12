@@ -1,25 +1,26 @@
-/* Draft Syergie Main Control (v.9)
- * 07/11/2018
-----------------------------------------
-NN:
-on   : publish from laptop
-off  : publish from main control
-----------------------------------------
+/* Syergie Main Control (v.9)
+ * 12/11/2018
+========================================
 Main Control:
 on   : input from joystick
 off  : manual input from Pixhawk
-----------------------------------------
+
 Speed Control:
 > 2 unit with switch (and LED indicator)
 > speed control left for propeller front left and back left
 > speed control right for propeller front right and back right
 > input manual from slider joystick 
-----------------------------------------
+
 Steer Control:
 > 2 unit with switch (and LED indicator)
 > steer control left for propeller front left and back left
 > steer control right for propeller front right and back right
 > input manual from slider joystick 
+----------------------------------------
+Winch:
+> winch per propeller 
+> turn to left for down (minimum value)
+> turn to right for up (maximum value)
 ----------------------------------------
 Tunning:
 > 4 unit with switch for each propeller
@@ -28,10 +29,7 @@ Tunning:
 > Minimum value for minus 0.1
 ----------------------------------------
 Delay with time sampling
-----------------------------------------
-Winch:
-> winch per propeller
-----------------------------------------
+========================================
 */
 
 /* Library math */
@@ -78,13 +76,12 @@ int winch3 = 0;
 int winch4 = 0;
 
 // Pin Switch
-//Switch utama
-const int switch_winch = 6;
-const int switch_manual = 7;           // input swicth main
+const int switch_winch = 5;
+const int switch_manual = 4;           // input swicth main
 const int switch_tunning = 8;          // input swicth main
-const int switch_speed_left = 5;  
+const int switch_speed_left = 6;  
 const int switch_speed_right = 28; 
-const int switch_steer_left = 4;  
+const int switch_steer_left = 7;  
 const int switch_steer_right = 29;  
 const int switch_steer1 = 24;           //tunning steer 1
 const int switch_steer2 = 25;           //tunning steer 2
@@ -104,13 +101,14 @@ int state_steer2 = 0;
 int state_steer3 = 0;
 int state_steer4 = 0;
 
+
 /* Control State */
 int state_control;
 
 /* TIme Sampling*/
 int time_sampling;
 
-
+//LED 
 int led_steer1;                //output tunning steer
 int led_steer2;
 int led_steer3;
@@ -121,8 +119,6 @@ const int led_winch;                  //output nn
 const int led_main = 13;                //output manual or pixhawk
 const int led_tunning;             //output tunning
 
-//Pulse
-//double nn_speed_in;
 
 // Pixhawk ,edited 16/10/2018 , Teguh
 const int pixhawk_1 = 23;
@@ -135,7 +131,10 @@ double pulse_pixhawk_3;
 double pulse_pixhawk_4;
 double azimuth;
 
-/* Declare IP Address */
+
+
+
+/* =============== Declare IP Address =============== */
 byte mac[]    = {  0xDA, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
 /*IPAddress ip(10, 48, 20, 37);        //IP for arduino
 IPAddress server(10, 48, 20, 36);   //IP for raspi/pc
@@ -143,10 +142,13 @@ IPAddress server(10, 48, 20, 36);   //IP for raspi/pc
 IPAddress ip(123, 45, 0, 9);        //IP for arduino
 IPAddress server(123, 45, 0, 10);   //IP for raspi/pc
 
-
 EthernetClient ethClient;
 PubSubClient client(ethClient);
 
+
+/* =============== Declare Function =============== */
+
+/* --------------- Call Back Function --------------- */
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -160,6 +162,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
+/* --------------- Reconnect Function --------------- */
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -181,7 +184,7 @@ void reconnect() {
   }
 }
 
-/* Speed Function */
+/* --------------- Speed Function --------------- */
 double pulse_speed(int joyspeed) {
   double pulse_speed_in;
   
@@ -194,7 +197,7 @@ double pulse_speed(int joyspeed) {
   else if (joyspeed <=600){
     pulse_speed_in = 1700;
    }
-  else if (joyspeed <=800){
+  else if (joyspeed <=920){
     pulse_speed_in = 1800;
    }
   else{
@@ -203,7 +206,7 @@ double pulse_speed(int joyspeed) {
   return pulse_speed_in;
 }
 
-// Steer Function
+/* --------------- Steer Function --------------- */
 double pulse_steer(int x, int y) {
   double pulse_steer_in;
   if (x <= 400){
@@ -259,7 +262,7 @@ double pulse_steer(int x, int y) {
   return pulse_steer_in; 
 }
 
-/* Tunning Function (KP) */
+/* --------------- Tunning Function (KP) --------------- */
 double pulse_tunning_p(int joytune_1) {
   double tunning_1;
   if (joytune_1 <=100){
@@ -274,7 +277,7 @@ double pulse_tunning_p(int joytune_1) {
   return tunning_1;
 }
 
-/*Tunning Function (KI)*/
+/* --------------- Tunning Function (KI) --------------- */
 double pulse_tunning_i(int joytune_2) {
   double tunning_2;
   if (joytune_2 <=100){
@@ -289,7 +292,7 @@ double pulse_tunning_i(int joytune_2) {
   return tunning_2;
 }
 
-/* Tunning Function (KD) */
+/* --------------- Tunning Function (KD) --------------- */
 double pulse_tunning_d(int joytune_3) {
   double tunning_3;
   if (joytune_3 <=100){
@@ -304,7 +307,7 @@ double pulse_tunning_d(int joytune_3) {
   return tunning_3;
 }
 
-/* Winch Function */
+/* --------------- Winch Function --------------- */
 double pulse_winch(int joy_winch) {
   double winch;
   if (joy_winch <=200){
@@ -319,6 +322,8 @@ double pulse_winch(int joy_winch) {
   return winch;
 }
 
+
+/* =============== MAIN PROGRAM (SETUP) =============== */
 void setup() {
   // Serial begin
   Serial.begin(57600);
@@ -361,6 +366,7 @@ void setup() {
   delay(1500);
 }
 
+/* =============== MAIN PROGRAM (LOOP) =============== */
 void loop() {
   char msgBuffer[20];
   int pulse_speed_in_left, pulse_speed_in_right;
@@ -370,11 +376,11 @@ void loop() {
   double kp1, kd1, kp2, kd2,kp3, kd3, kp4, kd4, ki1, ki2, ki3,ki4, xx;
   double w1, w2, w3, w4;
   
- /*if (!client.connected()) {
+ if (!client.connected()) {
    reconnect();
-  }*/
+  }
 
-    /*Winch Control*/
+/*---------------Winch Control---------------*/
     state_winch = digitalRead (switch_winch);
     if (state_winch == LOW){
       Serial.println(" Winch:on");
@@ -397,7 +403,7 @@ void loop() {
     }
   
 
-  /* Manual */
+/*---------------Manual---------------*/
  state_manual = digitalRead (switch_manual);
 
   //Switch Main : on
@@ -406,8 +412,10 @@ void loop() {
     digitalWrite(led_main, HIGH);
     Serial.println();
     Serial.println("Manual Mode");
+    client.publish("Mode", "manual");
 
-    /*Tunning*/
+
+/*---------------Tunning---------------*/
     int state_tunning = digitalRead(switch_tunning); // input swicth main
     if (state_tunning == LOW) {
       Serial.print("Tunning On  ");
@@ -497,7 +505,7 @@ void loop() {
     
     //Tunning off
     else {
-    /*Speed Control (main)*/
+    /*------Speed Control (main)------*/
     state_speed_left = digitalRead(switch_speed_left);          //edited
     state_speed_right = digitalRead(switch_speed_right);        //edited
     //Serial.print(state_speed_left);
@@ -524,7 +532,7 @@ void loop() {
     }
 
 
-    /*Steer Control (Main) */
+    /*------Steer Control (Main)------*/
     state_steer_left = digitalRead(switch_steer_left);        
     state_steer_right = digitalRead(switch_steer_right);      
     //Serial.print(state_steer_left);
@@ -556,6 +564,7 @@ void loop() {
     }
    }
   }
+  
   // Switch Main : off
   // Input smc dari pixhawk 
   else {
@@ -563,7 +572,7 @@ void loop() {
     Serial.println();  
     Serial.println("Pixhawk Mode");
       
-
+    /*---------------Pixhawk---------------*/
     // Pixhawk process , Teguh, 16/10/2018
     pulse_pixhawk_1 = pulseIn(pixhawk_1, HIGH);
     pulse_pixhawk_2 = pulseIn(pixhawk_2, HIGH);
@@ -622,18 +631,17 @@ void loop() {
      }
     //Serial.println(pulse_pixhawk);
     }
-
-
    
   client.loop();
-  /*
-  if (state_control == 0){
-  time_sampling = 10;
+
+  /*------Time Sampling)------*/
+  if (state_control == 0){   ///manual
+  time_sampling = 500;
   }
-  if (state_control == 1){
+  if (state_control == 1){   //pixhawk
   time_sampling = 1000;
   }
-  delay(time_sampling); */
+  delay(time_sampling); 
 
-  delay(1000);
+  //delay(1000);
 }
