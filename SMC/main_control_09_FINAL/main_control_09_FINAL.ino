@@ -41,8 +41,8 @@ Delay with time sampling
 #include <PubSubClient.h>
 
 // Joystick 
-#define joy_speed_left A9       //input main speed-left (front and back)
-#define joy_speed_right A8      //input main speed-right (front and back)
+#define joy_speed_left A8       //input main speed-left (front and back)
+#define joy_speed_right A9      //input main speed-right (front and back)
 #define joy_steer_leftx A6       
 #define joy_steer_lefty A7       
 #define joy_steer_rightx A0      
@@ -379,7 +379,7 @@ void loop() {
  if (!client.connected()) {
    reconnect();
   }
-
+  client.publish("ControlBox","connected");
 /*---------------Winch Control---------------*/
     state_winch = digitalRead (switch_winch);
     if (state_winch == LOW){
@@ -416,7 +416,7 @@ void loop() {
 
 
 /*---------------Tunning---------------*/
-    int state_tunning = digitalRead(switch_tunning); // input swicth main
+ /*   int state_tunning = digitalRead(switch_tunning); // input swicth main
     if (state_tunning == LOW) {
       Serial.print("Tunning On  ");
       tunning1 = analogRead(joy_tunning1);
@@ -504,7 +504,7 @@ void loop() {
     }
     
     //Tunning off
-    else {
+    else {*/
     /*------Speed Control (main)------*/
     state_speed_left = digitalRead(switch_speed_left);          //edited
     state_speed_right = digitalRead(switch_speed_right);        //edited
@@ -517,7 +517,7 @@ void loop() {
       delay(100);
       Serial.print(" Speed left: ");
       pulse_speed_in_left = pulse_speed(speed_left);
-      Serial.print(pulse_speed_in_left);
+      Serial.print(analogRead(joy_speed_left));
       client.publish("spc_speed1",dtostrf(pulse_speed_in_left, 4, 0, msgBuffer));
     }
     //Speed Control Right
@@ -563,7 +563,7 @@ void loop() {
       }
     }
    }
-  }
+  //}
   
   // Switch Main : off
   // Input smc dari pixhawk 

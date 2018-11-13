@@ -63,7 +63,7 @@ void loop() {
         Serial.print(potensio6);
    //     delay (500);
         Serial.print("   A7: ");
-        potensio7 = analogRead(joy7);
+        potensio7 = analogRead(A7);
         Serial.println(potensio7);
  //       delay (500);
 

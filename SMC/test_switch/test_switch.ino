@@ -3,20 +3,20 @@
 
 
 //Pin Switch
-const int switch_winch = 6;
-const int switch_manual = 7;           // input swicth main
-const int switch_tunning = 8;          // input swicth main
+const int switch_winch = 5;
+const int switch_manual = 4;           // input swicth main
+const int switch_tunning = 9;          // input swicth main
 
-const int switch_speed_left = 4;  
-const int switch_speed_right = 30; 
+const int switch_speed_left = 6;  
+const int switch_speed_right = 28; 
  
-const int switch_steer_left = 5;  
-const int switch_steer_right = 28;  
+const int switch_steer_left = 7;  
+const int switch_steer_right = 29;  
 
-const int switch_steer1 = 36;           //tunning steer 1
-const int switch_steer2 = 37;           //tunning steer 2
-const int switch_steer3 = 38;           //tunning steer 3
-const int switch_steer4 = 39;           //tunning steer 4
+const int switch_steer1 = 24;           //tunning steer 1
+const int switch_steer2 = 25;           //tunning steer 2
+const int switch_steer3 = 26;           //tunning steer 3
+const int switch_steer4 = 27;           //tunning steer 4
 
 
 // Initialize State Switch
