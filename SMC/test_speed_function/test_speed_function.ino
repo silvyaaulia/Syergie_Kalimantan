@@ -1,8 +1,8 @@
 //test_speed_function 
 //07/11/2018
 
-#define joyl A3
-#define joyr A5
+#define joyl A14
+#define joyr A15
 
 int potensiol = 0;
 int potensior = 0;
@@ -39,13 +39,13 @@ void loop() {
   int pulse_speed_in_left, pulse_speed_in_right;
 
         //speed kiri
-        Serial.print("   A5: ");
+        Serial.print("   A8: ");
         potensiol = analogRead(joyl);
         Serial.print(potensiol);
         pulse_speed_in_left = pulse_speed(potensiol);
 
         //speed kanan
-        Serial.print("    A3: ");
+        Serial.print("    A9: ");
         potensior = analogRead(joyr);
         Serial.println(potensior);
         pulse_speed_in_right = pulse_speed(potensior);
