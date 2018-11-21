@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>PropellerGaugeStyle.qml</file>
+        <file>EngineGaugeStyle.qml</file>
+        <file>AzimuthStyle.qml</file>
+        <file>MockUpFix.png</file>
+        <file>fuel-icon.png</file>
+        <file>temperature-icon.png</file>
+        <file>FuelStyle.qml</file>
+        <file>EngineIcon.png</file>
+        <file>PropIcon.png</file>
+        <file>FuelGaugeStyle.qml</file>
+        <file>TempGaugeStyle.qml</file>
+        <file>TempStyle.qml</file>
+    </qresource>
+</RCC>
