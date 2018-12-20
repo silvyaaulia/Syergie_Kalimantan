@@ -124,12 +124,21 @@ Window {
                 }
 
                 Rectangle {
-                    id: rectangle
+                    id: trainingRect
                     x: 0
                     y: 0
-                    width: 45
+                    width: 46
                     height: 40
                     color: trainingbutton.checked ? "#d3d3ff" : "#f3f3f4"
+                }
+
+                Image {
+                    id: image2
+                    x: 7
+                    y: 2
+                    width: 32
+                    height: 37
+                    source: "icon_training.png"
                 }
 
                 Text {
@@ -143,14 +152,7 @@ Window {
                     font.pixelSize: 16
                     visible: trainingbutton.checked
                 }
-                Image {
-                    id: image2
-                    x: 7
-                    y: 2
-                    width: 32
-                    height: 37
-                    source: "icon_training.png"
-                }
+
 
             }
         }
@@ -173,18 +175,35 @@ Window {
                 color: "#313131"
             }
 
+            /*-------add waypoint-------*/
             Button {
-                id: startbutton
+                id: addbutton
                 x: 8
                 y: 9
                 width: 42
                 height: 40
                 visible: {
-                    startbutton.checked = false;
-                    startbutton.checkable = true;
+                    addbutton.checked = false;
+                    addbutton.checkable = true;
 
                 }
 
+                Rectangle {
+                    id: addRect
+                    x: 0
+                    y: 0
+                    width: 46
+                    height: 40
+                    color: addbutton.checked ? "#d3d3ff" : "#f3f3f4"
+                }
+                Image {
+                    id: addIcon
+                    x: 7
+                    y: 2
+                    width: 32
+                    height: 37
+                    source: "icon_addWaypoint.png"
+                }
                 Text {
                     id: text5
                     x: -614
@@ -198,18 +217,20 @@ Window {
 
                 }
 
+                /*
                 Text {
                     id: text9
                     x: 3
                     y: 14
                     text: qsTr("Start")
                     font.pixelSize: 12
-                }
+                }*/
 
             }
 
+            /*-------start-------*/
             Button {
-                id: addbutton
+                id: startbutton
                 x: 60
                 y: 9
                 width: 41
@@ -219,13 +240,31 @@ Window {
                     addbutton.checkable = true;
                 }
 
+                Rectangle {
+                    id: startRect
+                    x: 0
+                    y: 0
+                    width: 46
+                    height: 40
+                    color: startbutton.checked ? "#d3d3ff" : "#f3f3f4"
+                }
+                Image {
+                    id: startIcon
+                    x: 7
+                    y: 2
+                    width: 32
+                    height: 37
+                    source: "icon_startMission.png"
+                }
+
+                /*
                 Text {
                     id: text8
                     x: 3
                     y: 14
                     text: qsTr("Add")
                     font.pixelSize: 12
-                }
+                }*/
 
                 Text {
                     id: text6
@@ -242,9 +281,8 @@ Window {
 
             }
 
-            /*-------add waypoint-------*/
 
-            /*-------start-------*/
+
 
         }
 
@@ -277,6 +315,23 @@ Window {
                     clearbutton.checkable = true;
                 }
 
+                Rectangle {
+                    id: clearRect
+                    x: 0
+                    y: 0
+                    width: 46
+                    height: 40
+                    color: clearbutton.checked ? "#d3d3ff" : "#f3f3f4"
+                }
+                Image {
+                    id: clearIcon
+                    x: 2
+                    y: 2
+                    width: 37
+                    height: 37
+                    source: "icon_clearTracking.png"
+                }
+
                 Text {
                     id: text7
                     x: -518
@@ -289,7 +344,7 @@ Window {
                     visible: clearbutton.checked
 
                 }
-
+                /*
                 Text {
                     id: text10
                     x: 1
@@ -297,7 +352,7 @@ Window {
                     text: qsTr("Clear")
                     font.pixelSize: 12
                 }
-
+                */
             }
 
             /*-------switch(view-hide)-------*/
