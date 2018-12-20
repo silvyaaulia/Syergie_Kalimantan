@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>icon_addWaypoint.png</file>
+        <file>icon_clearTracking.png</file>
+        <file>icon_startMission.png</file>
+        <file>icon_training.png</file>
+    </qresource>
+</RCC>
